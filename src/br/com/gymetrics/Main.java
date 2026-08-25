@@ -10,7 +10,7 @@ public class Main {
 
 		JFrame frame = new JFrame("Gymetrics");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(300, 200);
+		frame.setSize(900, 700);
 
 		GymSingleton gym = GymSingleton.getInstance();
 		
