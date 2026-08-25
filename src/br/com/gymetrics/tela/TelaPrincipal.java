@@ -1,7 +1,12 @@
 package br.com.gymetrics.tela;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
+
+import br.com.gymetrics.GymSingleton;
 
 public class TelaPrincipal extends JPanel {
 	public TelaPrincipal() {
@@ -15,16 +20,25 @@ public class TelaPrincipal extends JPanel {
 		resumo.add(new JLabel("Entradas hoje: 0", SwingConstants.CENTER));
 		resumo.add(new JLabel("Bloqueados: 0", SwingConstants.CENTER));
 		resumo.add(new JLabel("Vencimentos: 0", SwingConstants.CENTER));
-
 		this.add(resumo, BorderLayout.CENTER);
 
-		JPanel menu = new JPanel();
-		menu.add(new JButton("Check-in"));
-		menu.add(new JButton("Alunos"));
-		menu.add(new JButton("Planos"));
-		menu.add(new JButton("Financeiro"));
-		menu.add(new JButton("Sair"));
+		JPanel acoesRapidas = new JPanel();
+		acoesRapidas.add(genGtBtn("Check-in", "check-in"));
+		acoesRapidas.add(genGtBtn("Alunos", "genAlunos"));
+		acoesRapidas.add(genGtBtn("Planos", "genPlanos"));
+		acoesRapidas.add(genGtBtn("Financeiro", "genFinanceiro"));
+		acoesRapidas.add(genGtBtn("Sair", "login"));
+		this.add(acoesRapidas, BorderLayout.SOUTH);
+	}
 
-		this.add(menu, BorderLayout.SOUTH);
+	private JButton genGtBtn(String texto, String nomeTela) {
+		JButton bt = new JButton(texto);
+		bt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GymSingleton.getInstance().showTela(nomeTela);
+			}
+		});
+		return bt;
 	}
 }
