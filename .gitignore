@@ -1,0 +1,64 @@
+# Compilacao Java
+*.class
+/bin/
+/out/
+/target/
+/build/
+/dist/
+
+# Eclipse
+/.metadata/
+/.recommenders/
+/.externalToolBuilders/
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+/.vscode/
+
+# Banco SQLite gerado durante a execucao
+/data/
+/database/*.db
+/database/*.sqlite
+/database/*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+
+# Logs, relatorios e arquivos exportados
+*.log
+/logs/
+/exports/
+/reports/
+/test-output/
+/coverage/
+
+# Arquivos temporarios e backups
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+/.cache/
+
+# Variaveis de ambiente e segredos locais
+.env
+.env.*
+!.env.example
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Relatorios de erro da JVM
+hs_err_pid*
+replay_pid*
