@@ -10,7 +10,6 @@ public class Main {
 
 		JFrame frame = new JFrame("Gymetrics");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		GymSingleton gym = GymSingleton.getInstance();

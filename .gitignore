@@ -1,4 +1,6 @@
 # Compilacao Java
+#
+Gym.db
 *.class
 /bin/
 /out/

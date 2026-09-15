@@ -1,6 +1,7 @@
 package br.com.gymetrics;
 
 import java.awt.CardLayout;
+import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,7 +29,20 @@ public class GymSingleton {
 		telas.add(new TelaGerenciamentoAlunos(), "genAlunos");
 		telas.add(new TelaGerenciamentoFinanceiro(), "genFinanceiro");
 		telas.add(new TelaLogin(), "login");
-
+		
+		
+		var data = new Data();
+		
+		try {
+			Class.forName("org.sqlite.JDBC");
+			data.open("Gym.db");
+		} catch (SQLException e) {
+			this.showMsg("falha no boot: " + e);
+			System.exit(0);
+		} catch (ClassNotFoundException e) {
+			this.showMsg("falha no boot [driver sqlite ñ encontrado]: " + e);
+			System.exit(1);
+		}
 	}
 	
 	public void showTela(String nome) {
