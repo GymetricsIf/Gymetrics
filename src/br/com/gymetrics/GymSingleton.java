@@ -12,6 +12,7 @@ public class GymSingleton {
 	private static GymSingleton instance = null;
 	
 	private CardLayout telasLayout = null;
+	private Data data = null;
 	private boolean mp = false;
 	private JPanel telas = null;
 	
@@ -36,6 +37,8 @@ public class GymSingleton {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			data.open("Gym.db");
+			this.data = data;
+			this.data.run("SELECT 1");
 		} catch (SQLException e) {
 			this.showMsg("falha no boot: " + e);
 			System.exit(0);
@@ -58,9 +61,23 @@ public class GymSingleton {
 	public JPanel takeFrame() {
 		if (mp) throw new Error("BUG: Alguem ja tem o frame das telas owned");
 		mp = true;
+		
+		
 		return this.telas;
 	}
 	
+	public void shutdown() {
+		if (!mp)
+			throw new Error("BUG: o App não está com o frame inicializado.");
+		
+		try {
+			data.suicide();
+			System.out.println("> consegui fechar o BD!");
+		} catch (SQLException e) {
+			System.out.println("> ñ foi possivel fechar o BD.");
+			e.printStackTrace();
+		}
+	}
 	
 	public static GymSingleton getInstance() {
 		if (instance == null) {
