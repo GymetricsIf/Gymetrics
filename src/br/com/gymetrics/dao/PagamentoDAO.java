@@ -1,9 +1,41 @@
 package br.com.gymetrics.dao;
 
-import br.com.gymetrics.model.*; import br.com.gymetrics.util.ConexaoSQLite; import java.sql.*;
+import java.sql.SQLException;
+
+import br.com.gymetrics.Data;
+import br.com.gymetrics.entidade.eAluno;
+import br.com.gymetrics.entidade.ePagamento;
+import br.com.gymetrics.entidade.eMensalidade;
 
 public class PagamentoDAO {
-    public void salvar(Pagamento p)throws SQLException{
-        try(Connection c=ConexaoSQLite.conectar()){c.setAutoCommit(false);try(PreparedStatement q=c.prepareStatement("INSERT INTO pagamentos(mensalidade_id,mes_referencia,valor_pago,data_pagamento) VALUES(?,?,?,?)",Statement.RETURN_GENERATED_KEYS);PreparedStatement m=c.prepareStatement("UPDATE mensalidades SET status='PAGA' WHERE id=?");PreparedStatement a=c.prepareStatement("UPDATE alunos SET status='ATIVO' WHERE status='INADIMPLENTE' AND id=(SELECT aluno_id FROM mensalidades WHERE id=?)")){q.setInt(1,p.getMensalidade().getId());q.setString(2,p.getMesReferencia().toString());q.setBigDecimal(3,p.getValorPago());q.setString(4,p.getDataPagamento().toString());q.executeUpdate();try(ResultSet r=q.getGeneratedKeys()){if(r.next())p.setId(r.getInt(1));}m.setInt(1,p.getMensalidade().getId());m.executeUpdate();a.setInt(1,p.getMensalidade().getId());a.executeUpdate();c.commit();p.getMensalidade().marcarComoPaga();if(p.getMensalidade().getAluno()!=null)p.getMensalidade().getAluno().ativar();}catch(SQLException e){c.rollback();throw e;}}
-    }
+	private final Data db;
+
+	public PagamentoDAO(Data db) {
+		this.db = db;
+	}
+
+	/** Grava o pagamento, quita a mensalidade e reativa o aluno inadimplente, tudo numa transação. */
+	public void salvar(ePagamento p) throws SQLException {
+		p.validar();
+		int mensalidadeId = p.getMensalidade().getId();
+
+		db.transacao(() -> {
+			p.setId(db.insert(
+				"INSERT INTO pagamentos(mensalidade_id, mes_referencia, valor_pago, data_pagamento) VALUES(?,?,?,?)",
+				ps -> {
+					ps.setInt(1, mensalidadeId);
+					ps.setString(2, p.getMesReferencia().toString());
+					ps.setBigDecimal(3, p.getValorPago());
+					ps.setString(4, p.getDataPagamento().toString());
+				}));
+			db.update("UPDATE mensalidades SET status='PAGA' WHERE id=?", ps -> ps.setInt(1, mensalidadeId));
+			db.update("UPDATE alunos SET status='ATIVO' WHERE status='INADIMPLENTE' "
+					+ "AND id = (SELECT aluno_id FROM mensalidades WHERE id=?)", ps -> ps.setInt(1, mensalidadeId));
+		});
+
+		eMensalidade m = p.getMensalidade();
+		m.setStatus(eMensalidade.Status.PAGA);
+		if (m.getAluno() != null && m.getAluno().getStatus() == eAluno.Status.INADIMPLENTE)
+			m.getAluno().setStatus(eAluno.Status.ATIVO);
+	}
 }

@@ -1,6 +1,7 @@
 package br.com.gymetrics;
 
 import java.awt.CardLayout;
+import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -13,9 +14,17 @@ public class GymSingleton {
 	private CardLayout telasLayout = null;
 	private boolean mp = false;
 	private JPanel telas = null;
+	private Data data = new Data();
 	
 	public GymSingleton() {
 		System.out.println("Gym Core!");
+		
+		try {
+			data.open("gymetrics.db");
+			data.criarTabelas();
+		} catch (SQLException e) {
+			throw new RuntimeException("Não foi possível abrir o banco de dados", e);
+		}
 		
 		this.telasLayout = new CardLayout();
 		this.telas = new JPanel();
@@ -34,6 +43,10 @@ public class GymSingleton {
 	public void showTela(String nome) {
 		System.out.printf("> mostrando %s!\n", nome);
         ((CardLayout) telas.getLayout()).show(telas, nome);
+	}
+	
+	public Data getData() {
+		return data;
 	}
 	
 	public void showMsg(String text) {
