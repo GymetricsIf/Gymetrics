@@ -1,6 +1,7 @@
 # Compilacao Java
 #
 Gym.db
+gymetrics.db
 *.class
 /bin/
 /out/

@@ -1,4 +1,4 @@
-package br.com.gymetrics.entidade;
+package br.com.gymetrics.negocios;
 
 import java.time.LocalDateTime;
 

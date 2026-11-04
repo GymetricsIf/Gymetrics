@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.entidade.ePlano;
+import br.com.gymetrics.negocios.ePlano;
 
 public class PlanoDAO {
 	private final Data db;

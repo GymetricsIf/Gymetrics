@@ -1,4 +1,4 @@
-package br.com.gymetrics.tela;
+package br.com.gymetrics.telas;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;

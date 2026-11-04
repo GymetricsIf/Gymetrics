@@ -8,9 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.entidade.eAluno;
-import br.com.gymetrics.entidade.ePlano;
-import br.com.gymetrics.entidade.eUsuario;
+import br.com.gymetrics.negocios.eAluno;
+import br.com.gymetrics.negocios.ePlano;
+import br.com.gymetrics.negocios.eUsuario;
 
 public class AlunoDAO {
 	private static final String SELECT =

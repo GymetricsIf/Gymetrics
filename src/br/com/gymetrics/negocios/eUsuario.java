@@ -1,4 +1,4 @@
-package br.com.gymetrics.entidade;
+package br.com.gymetrics.negocios;
 
 public class eUsuario {
 	private int id;

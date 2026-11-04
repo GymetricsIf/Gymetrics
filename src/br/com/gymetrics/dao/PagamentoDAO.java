@@ -3,9 +3,9 @@ package br.com.gymetrics.dao;
 import java.sql.SQLException;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.entidade.eAluno;
-import br.com.gymetrics.entidade.ePagamento;
-import br.com.gymetrics.entidade.eMensalidade;
+import br.com.gymetrics.negocios.eAluno;
+import br.com.gymetrics.negocios.ePagamento;
+import br.com.gymetrics.negocios.eMensalidade;
 
 public class PagamentoDAO {
 	private final Data db;

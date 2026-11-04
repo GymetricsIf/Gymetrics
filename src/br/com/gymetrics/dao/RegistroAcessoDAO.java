@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.entidade.eAluno;
-import br.com.gymetrics.entidade.eRegistroAcesso;
+import br.com.gymetrics.negocios.eAluno;
+import br.com.gymetrics.negocios.eRegistroAcesso;
 
 public class RegistroAcessoDAO {
 	private final Data db;

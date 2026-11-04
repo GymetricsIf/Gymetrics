@@ -1,4 +1,4 @@
-package br.com.gymetrics.entidade;
+package br.com.gymetrics.negocios;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

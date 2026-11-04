@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.entidade.eUsuario;
+import br.com.gymetrics.negocios.eUsuario;
 
 public class UsuarioDAO {
 	private static final int MAX_TENTATIVAS = 10;
