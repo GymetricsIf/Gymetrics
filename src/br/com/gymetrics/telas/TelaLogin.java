@@ -2,39 +2,84 @@ package br.com.gymetrics.telas;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+
 import br.com.gymetrics.GymSingleton;
+import br.com.gymetrics.negocio.Usuario;
 
-public class TelaLogin extends JPanel {
+/** Protótipo da seção 4.1 (página 41 do documento). CSU03 / RF10. */
+public class TelaLogin extends JPanel implements Atualizavel {
+	private final Estilo.Campo txtUsuario = new Estilo.Campo("Usuario", 280);
+	private final Estilo.CampoSenha txtSenha = new Estilo.CampoSenha("Senha", 280);
+
 	public TelaLogin() {
-		setLayout(new GridBagLayout()); setBackground(Color.WHITE);
+		setLayout(new GridBagLayout());
+		setBackground(Estilo.FUNDO);
 
-		JPanel card = new JPanel(new GridLayout(0, 1, 8, 8)); card.setBackground(Color.WHITE);
-		card.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(220, 220, 220)), new EmptyBorder(30, 40, 30, 40)
-		));
+		JPanel coluna = new JPanel();
+		coluna.setLayout(new BoxLayout(coluna, BoxLayout.Y_AXIS));
+		coluna.setOpaque(false);
 
-		JLabel titulo = new JLabel("GYMETRICS", SwingConstants.CENTER); titulo.setFont(new Font("SansSerif", Font.BOLD, 26));
-		JLabel subtitulo = new JLabel("ACESSO AO SISTEMA", SwingConstants.CENTER); subtitulo.setFont(new Font("SansSerif", Font.PLAIN, 10)); subtitulo.setForeground(Color.GRAY);
-		card.add(titulo); card.add(subtitulo);
+		coluna.add(Estilo.avatar(72));
+		coluna.add(Box.createVerticalStrut(14));
 
-		JLabel lblUser = new JLabel("Usuário:"); lblUser.setFont(new Font("SansSerif", Font.BOLD, 12)); card.add(lblUser);
-		JTextField txtUser = new JTextField(15); estilizarCampo(txtUser); card.add(txtUser);
+		JLabel titulo = new JLabel("CADASTRO");
+		titulo.setFont(Estilo.fonte(Font.BOLD, 34));
+		titulo.setForeground(Estilo.TEXTO);
+		titulo.setAlignmentX(CENTER_ALIGNMENT);
+		coluna.add(titulo);
 
-		JLabel lblSenha = new JLabel("Senha:"); lblSenha.setFont(new Font("SansSerif", Font.BOLD, 12)); card.add(lblSenha);
-		JPasswordField txtSenha = new JPasswordField(15); estilizarCampo(txtSenha); card.add(txtSenha);
+		JLabel subtitulo = new JLabel("Digite seus dados");
+		subtitulo.setFont(Estilo.fonte(Font.PLAIN, 10));
+		subtitulo.setForeground(Estilo.TEXTO_SUAVE);
+		subtitulo.setAlignmentX(CENTER_ALIGNMENT);
+		coluna.add(subtitulo);
 
-		JButton btnEntrar = new JButton("Entrar"); btnEntrar.setFont(new Font("SansSerif", Font.BOLD, 13));
-		btnEntrar.setBackground(new Color(40, 40, 40)); btnEntrar.setForeground(Color.WHITE); btnEntrar.setFocusable(false);
-		btnEntrar.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)), new EmptyBorder(8, 0, 8, 0)));
-		btnEntrar.addActionListener(e -> GymSingleton.getInstance().showTela("principal"));
-		
-		card.add(Box.createVerticalStrut(5)); card.add(btnEntrar);
-		add(card);
+		coluna.add(Box.createVerticalStrut(28));
+		txtUsuario.setAlignmentX(CENTER_ALIGNMENT);
+		coluna.add(txtUsuario);
+		coluna.add(Box.createVerticalStrut(10));
+		txtSenha.setAlignmentX(CENTER_ALIGNMENT);
+		coluna.add(txtSenha);
+		coluna.add(Box.createVerticalStrut(32));
+
+		Estilo.Botao entrar = Estilo.botao("Entrar", this::entrar);
+		entrar.setFont(Estilo.fonte(Font.BOLD, 16));
+		entrar.setPreferredSize(new Dimension(280, 46));
+		entrar.setMaximumSize(new Dimension(280, 46));
+		entrar.setAlignmentX(CENTER_ALIGNMENT);
+		coluna.add(entrar);
+
+		txtUsuario.addActionListener(e -> txtSenha.requestFocusInWindow());
+		txtSenha.addActionListener(e -> entrar());
+
+		add(coluna);
 	}
 
-	private void estilizarCampo(JTextField campo) {
-		campo.setFont(new Font("SansSerif", Font.PLAIN, 13));
-		campo.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)), new EmptyBorder(5, 8, 5, 8)));
+	private void entrar() {
+		GymSingleton gym = GymSingleton.getInstance();
+		String login = txtUsuario.getText();
+		String senha = new String(txtSenha.getPassword());
+
+		gym.executar(() -> {
+			if (login.isBlank() || senha.isEmpty())
+				throw new IllegalArgumentException("Informe o usuário e a senha.");
+
+			Usuario u = gym.usuarios().autenticar(login, senha);
+			if (u == null) {
+				txtSenha.setText("");
+				throw new IllegalArgumentException(gym.usuarios().estaBloqueado(login)
+						? "Usuário bloqueado após 10 tentativas erradas. Procure o administrador."
+						: "Usuário ou senha incorretos.");
+			}
+			gym.setUsuarioLogado(u);
+			gym.showTela("principal");
+		});
+	}
+
+	@Override
+	public void atualizar() {
+		txtUsuario.setText("");
+		txtSenha.setText("");
+		SwingUtilities.invokeLater(txtUsuario::requestFocusInWindow);
 	}
 }
