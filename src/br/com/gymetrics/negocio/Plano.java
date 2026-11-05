@@ -1,17 +1,17 @@
-package br.com.gymetrics.negocios;
+package br.com.gymetrics.negocio;
 
 import java.math.BigDecimal;
 
-public class ePlano {
+public class Plano {
 	private int id;
 	private String nome;
 	private BigDecimal valorMensal;
 	private int diaVencimento;
 	private boolean ativo = true;
 
-	public ePlano() {}
+	public Plano() {}
 
-	public ePlano(int id, String nome, BigDecimal valorMensal, int diaVencimento, boolean ativo) {
+	public Plano(int id, String nome, BigDecimal valorMensal, int diaVencimento, boolean ativo) {
 		this.id = id;
 		this.nome = nome;
 		this.valorMensal = valorMensal;

@@ -3,9 +3,9 @@ package br.com.gymetrics.dao;
 import java.sql.SQLException;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.negocios.eAluno;
-import br.com.gymetrics.negocios.ePagamento;
-import br.com.gymetrics.negocios.eMensalidade;
+import br.com.gymetrics.negocio.Aluno;
+import br.com.gymetrics.negocio.Mensalidade;
+import br.com.gymetrics.negocio.Pagamento;
 
 public class PagamentoDAO {
 	private final Data db;
@@ -15,7 +15,7 @@ public class PagamentoDAO {
 	}
 
 	/** Grava o pagamento, quita a mensalidade e reativa o aluno inadimplente, tudo numa transação. */
-	public void salvar(ePagamento p) throws SQLException {
+	public void salvar(Pagamento p) throws SQLException {
 		p.validar();
 		int mensalidadeId = p.getMensalidade().getId();
 
@@ -33,9 +33,9 @@ public class PagamentoDAO {
 					+ "AND id = (SELECT aluno_id FROM mensalidades WHERE id=?)", ps -> ps.setInt(1, mensalidadeId));
 		});
 
-		eMensalidade m = p.getMensalidade();
-		m.setStatus(eMensalidade.Status.PAGA);
-		if (m.getAluno() != null && m.getAluno().getStatus() == eAluno.Status.INADIMPLENTE)
-			m.getAluno().setStatus(eAluno.Status.ATIVO);
+		Mensalidade m = p.getMensalidade();
+		m.setStatus(Mensalidade.Status.PAGA);
+		if (m.getAluno() != null && m.getAluno().getStatus() == Aluno.Status.INADIMPLENTE)
+			m.getAluno().setStatus(Aluno.Status.ATIVO);
 	}
 }

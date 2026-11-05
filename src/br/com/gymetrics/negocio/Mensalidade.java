@@ -1,20 +1,20 @@
-package br.com.gymetrics.negocios;
+package br.com.gymetrics.negocio;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class eMensalidade {
+public class Mensalidade {
 	public enum Status { PENDENTE, VENCIDA, PAGA }
 
 	private int id;
-	private eAluno aluno;
+	private Aluno aluno;
 	private LocalDate vencimento;
 	private BigDecimal valor;
 	private Status status = Status.PENDENTE;
 
-	public eMensalidade() {}
+	public Mensalidade() {}
 
-	public eMensalidade(int id, eAluno aluno, LocalDate vencimento, BigDecimal valor, Status status) {
+	public Mensalidade(int id, Aluno aluno, LocalDate vencimento, BigDecimal valor, Status status) {
 		this.id = id;
 		this.aluno = aluno;
 		this.vencimento = vencimento;
@@ -25,8 +25,8 @@ public class eMensalidade {
 	public int getId() { return id; }
 	public void setId(int id) { this.id = id; }
 
-	public eAluno getAluno() { return aluno; }
-	public void setAluno(eAluno aluno) { this.aluno = aluno; }
+	public Aluno getAluno() { return aluno; }
+	public void setAluno(Aluno aluno) { this.aluno = aluno; }
 
 	public LocalDate getVencimento() { return vencimento; }
 	public void setVencimento(LocalDate vencimento) { this.vencimento = vencimento; }

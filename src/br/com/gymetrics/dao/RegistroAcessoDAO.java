@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.negocios.eAluno;
-import br.com.gymetrics.negocios.eRegistroAcesso;
+import br.com.gymetrics.negocio.Aluno;
+import br.com.gymetrics.negocio.RegistroAcesso;
 
 public class RegistroAcessoDAO {
 	private final Data db;
@@ -17,7 +17,7 @@ public class RegistroAcessoDAO {
 		this.db = db;
 	}
 
-	public void salvar(eRegistroAcesso r) throws SQLException {
+	public void salvar(RegistroAcesso r) throws SQLException {
 		r.setId(db.insert(
 			"INSERT INTO registros_acesso(aluno_id, data_hora, tipo, observacao) VALUES(?,?,?,?)",
 			ps -> {
@@ -30,19 +30,48 @@ public class RegistroAcessoDAO {
 	}
 
 	/** Aluno pode ser null (não encontrado): nesse caso nada é gravado. */
-	public eRegistroAcesso registrarEntrada(eAluno aluno) throws SQLException {
-		eRegistroAcesso r = eRegistroAcesso.entrada(aluno);
+	public RegistroAcesso registrarEntrada(Aluno aluno) throws SQLException {
+		RegistroAcesso r = RegistroAcesso.entrada(aluno);
 		if (aluno != null) salvar(r);
 		return r;
 	}
 
-	public eRegistroAcesso registrarSaida(eAluno aluno) throws SQLException {
-		eRegistroAcesso r = eRegistroAcesso.saida(aluno);
+	public RegistroAcesso registrarSaida(Aluno aluno) throws SQLException {
+		RegistroAcesso r = RegistroAcesso.saida(aluno);
 		salvar(r);
 		return r;
 	}
 
-	public List<eRegistroAcesso> listarPorPeriodo(LocalDate inicio, LocalDate fim) throws SQLException {
+	public int contarEntradas(LocalDate dia) throws SQLException {
+		return db.exec("SELECT COUNT(*) FROM registros_acesso WHERE tipo='CHECK_IN' AND date(data_hora) = ?",
+			ps -> ps.setString(1, dia.toString()), rs -> rs.getInt(1)).get(0);
+	}
+
+	/** True se a última movimentação do aluno hoje foi uma entrada, ou seja, ele ainda está na academia. */
+	public boolean estaPresente(Aluno aluno, LocalDate dia) throws SQLException {
+		List<String> ultimo = db.exec(
+			"SELECT tipo FROM registros_acesso WHERE aluno_id = ? AND date(data_hora) = ? "
+			+ "AND tipo IN ('CHECK_IN','CHECK_OUT') ORDER BY id DESC LIMIT 1",
+			ps -> {
+				ps.setInt(1, aluno.getId());
+				ps.setString(2, dia.toString());
+			}, rs -> rs.getString(1));
+		return !ultimo.isEmpty() && ultimo.get(0).equals("CHECK_IN");
+	}
+
+	/** Alunos cuja última movimentação do dia foi uma entrada (RF08). */
+	public int contarPresentes(LocalDate dia) throws SQLException {
+		return db.exec(
+			"SELECT COUNT(*) FROM registros_acesso r WHERE r.tipo='CHECK_IN' AND date(r.data_hora) = ? "
+			+ "AND r.id = (SELECT MAX(r2.id) FROM registros_acesso r2 WHERE r2.aluno_id = r.aluno_id "
+			+ "AND r2.tipo IN ('CHECK_IN','CHECK_OUT') AND date(r2.data_hora) = ?)",
+			ps -> {
+				ps.setString(1, dia.toString());
+				ps.setString(2, dia.toString());
+			}, rs -> rs.getInt(1)).get(0);
+	}
+
+	public List<RegistroAcesso> listarPorPeriodo(LocalDate inicio, LocalDate fim) throws SQLException {
 		if (inicio == null || fim == null || fim.isBefore(inicio))
 			throw new IllegalArgumentException("Período inválido");
 
@@ -55,16 +84,16 @@ public class RegistroAcessoDAO {
 				ps.setString(2, fim.toString());
 			},
 			rs -> {
-				eAluno aluno = null;
+				Aluno aluno = null;
 				if (rs.getObject("aluno_id") != null) {
-					aluno = new eAluno();
+					aluno = new Aluno();
 					aluno.setId(rs.getInt("aluno_id"));
 					aluno.setNome(rs.getString("nome"));
 					aluno.setCpf(rs.getString("cpf"));
-					aluno.setStatus(eAluno.Status.valueOf(rs.getString("status")));
+					aluno.setStatus(Aluno.Status.valueOf(rs.getString("status")));
 				}
-				return new eRegistroAcesso(rs.getInt("id"), aluno, LocalDateTime.parse(rs.getString("data_hora")),
-						eRegistroAcesso.Tipo.valueOf(rs.getString("tipo")), rs.getString("observacao"));
+				return new RegistroAcesso(rs.getInt("id"), aluno, LocalDateTime.parse(rs.getString("data_hora")),
+						RegistroAcesso.Tipo.valueOf(rs.getString("tipo")), rs.getString("observacao"));
 			});
 	}
 }

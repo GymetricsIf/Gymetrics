@@ -1,8 +1,8 @@
-package br.com.gymetrics.negocios;
+package br.com.gymetrics.negocio;
 
 import java.time.LocalDate;
 
-public class eAluno {
+public class Aluno {
 	public enum Status { ATIVO, INADIMPLENTE, BLOQUEADO }
 
 	private int id;
@@ -13,12 +13,12 @@ public class eAluno {
 	private LocalDate dataNascimento;
 	private String codigoAcesso;
 	private Status status = Status.ATIVO;
-	private ePlano plano;
+	private Plano plano;
 
-	public eAluno() {}
+	public Aluno() {}
 
-	public eAluno(int id, String nome, String cpf, String endereco, String telefone,
-			LocalDate dataNascimento, String codigoAcesso, Status status, ePlano plano) {
+	public Aluno(int id, String nome, String cpf, String endereco, String telefone,
+			LocalDate dataNascimento, String codigoAcesso, Status status, Plano plano) {
 		this.id = id;
 		this.nome = nome;
 		this.cpf = cpf;
@@ -74,6 +74,6 @@ public class eAluno {
 	public Status getStatus() { return status; }
 	public void setStatus(Status status) { this.status = status; }
 
-	public ePlano getPlano() { return plano; }
-	public void setPlano(ePlano plano) { this.plano = plano; }
+	public Plano getPlano() { return plano; }
+	public void setPlano(Plano plano) { this.plano = plano; }
 }

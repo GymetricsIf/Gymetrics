@@ -8,9 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.com.gymetrics.Data;
-import br.com.gymetrics.negocios.eAluno;
-import br.com.gymetrics.negocios.ePlano;
-import br.com.gymetrics.negocios.eUsuario;
+import br.com.gymetrics.negocio.Aluno;
+import br.com.gymetrics.negocio.Plano;
+import br.com.gymetrics.negocio.Usuario;
 
 public class AlunoDAO {
 	private static final String SELECT =
@@ -23,14 +23,14 @@ public class AlunoDAO {
 		this.db = db;
 	}
 
-	public void salvar(eAluno a) throws SQLException {
+	public void salvar(Aluno a) throws SQLException {
 		a.validar();
 		a.setId(db.insert(
 			"INSERT INTO alunos(nome, cpf, endereco, telefone, data_nascimento, codigo_acesso, status, plano_id) VALUES(?,?,?,?,?,?,?,?)",
 			ps -> preencher(ps, a)));
 	}
 
-	public void atualizar(eAluno a) throws SQLException {
+	public void atualizar(Aluno a) throws SQLException {
 		a.validar();
 		db.update(
 			"UPDATE alunos SET nome=?, cpf=?, endereco=?, telefone=?, data_nascimento=?, codigo_acesso=?, status=?, plano_id=? WHERE id=?",
@@ -40,7 +40,7 @@ public class AlunoDAO {
 			});
 	}
 
-	public List<eAluno> buscar(String termo) throws SQLException {
+	public List<Aluno> buscar(String termo) throws SQLException {
 		String like = "%" + (termo == null ? "" : termo) + "%";
 		return db.exec(SELECT + "WHERE a.nome LIKE ? OR a.cpf LIKE ? ORDER BY a.nome",
 			ps -> {
@@ -49,16 +49,25 @@ public class AlunoDAO {
 			}, AlunoDAO::map);
 	}
 
-	public eAluno buscarPorCpfOuCodigo(String valor) throws SQLException {
-		List<eAluno> lista = db.exec(SELECT + "WHERE a.cpf = ? OR a.codigo_acesso = ?",
+	/** Aceita o CPF com ou sem pontuação, ou o código numérico de acesso. */
+	public Aluno buscarPorCpfOuCodigo(String valor) throws SQLException {
+		String digitos = valor == null ? "" : valor.replaceAll("\\D", "");
+		if (digitos.isEmpty()) return null;
+		List<Aluno> lista = db.exec(SELECT
+				+ "WHERE replace(replace(replace(a.cpf, '.', ''), '-', ''), ' ', '') = ? OR a.codigo_acesso = ?",
 			ps -> {
-				ps.setString(1, valor);
-				ps.setString(2, valor);
+				ps.setString(1, digitos);
+				ps.setString(2, digitos);
 			}, AlunoDAO::map);
 		return lista.isEmpty() ? null : lista.get(0);
 	}
 
-	public void bloquear(eAluno a, String motivo, eUsuario responsavel) throws SQLException {
+	public int contar(Aluno.Status status) throws SQLException {
+		return db.exec("SELECT COUNT(*) FROM alunos WHERE status = ?",
+			ps -> ps.setString(1, status.name()), rs -> rs.getInt(1)).get(0);
+	}
+
+	public void bloquear(Aluno a, String motivo, Usuario responsavel) throws SQLException {
 		if (motivo == null || motivo.isBlank())
 			throw new IllegalArgumentException("Informe o motivo do bloqueio");
 
@@ -72,10 +81,10 @@ public class AlunoDAO {
 					else ps.setInt(3, responsavel.getId());
 				});
 		});
-		a.setStatus(eAluno.Status.BLOQUEADO);
+		a.setStatus(Aluno.Status.BLOQUEADO);
 	}
 
-	private void preencher(PreparedStatement ps, eAluno a) throws SQLException {
+	private void preencher(PreparedStatement ps, Aluno a) throws SQLException {
 		ps.setString(1, a.getNome());
 		ps.setString(2, a.getCpf());
 		ps.setString(3, a.getEndereco());
@@ -87,16 +96,16 @@ public class AlunoDAO {
 		else ps.setInt(8, a.getPlano().getId());
 	}
 
-	private static eAluno map(ResultSet rs) throws SQLException {
-		ePlano plano = null;
+	private static Aluno map(ResultSet rs) throws SQLException {
+		Plano plano = null;
 		if (rs.getObject("p_id") != null)
-			plano = new ePlano(rs.getInt("p_id"), rs.getString("p_nome"), rs.getBigDecimal("valor_mensal"),
+			plano = new Plano(rs.getInt("p_id"), rs.getString("p_nome"), rs.getBigDecimal("valor_mensal"),
 					rs.getInt("dia_vencimento"), rs.getBoolean("p_ativo"));
 
 		String nascimento = rs.getString("data_nascimento");
-		return new eAluno(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"),
+		return new Aluno(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"),
 				rs.getString("endereco"), rs.getString("telefone"),
 				nascimento == null ? null : LocalDate.parse(nascimento),
-				rs.getString("codigo_acesso"), eAluno.Status.valueOf(rs.getString("status")), plano);
+				rs.getString("codigo_acesso"), Aluno.Status.valueOf(rs.getString("status")), plano);
 	}
 }

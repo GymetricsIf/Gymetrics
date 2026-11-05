@@ -1,6 +1,6 @@
-package br.com.gymetrics.negocios;
+package br.com.gymetrics.negocio;
 
-public class eUsuario {
+public class Usuario {
 	private int id;
 	private String login;
 	private String senha;
@@ -8,9 +8,9 @@ public class eUsuario {
 	private String perfil; // ADMINISTRADOR ou RECEPCIONISTA
 	private boolean ativo = true;
 
-	public eUsuario() {}
+	public Usuario() {}
 
-	public eUsuario(int id, String login, String senha, String nome, String perfil, boolean ativo) {
+	public Usuario(int id, String login, String senha, String nome, String perfil, boolean ativo) {
 		this.id = id;
 		this.login = login;
 		this.senha = senha;

@@ -1,19 +1,19 @@
-package br.com.gymetrics.negocios;
+package br.com.gymetrics.negocio;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 
-public class ePagamento {
+public class Pagamento {
 	private int id;
-	private eMensalidade mensalidade;
+	private Mensalidade mensalidade;
 	private YearMonth mesReferencia;
 	private BigDecimal valorPago;
 	private LocalDateTime dataPagamento = LocalDateTime.now();
 
-	public ePagamento() {}
+	public Pagamento() {}
 
-	public ePagamento(int id, eMensalidade mensalidade, YearMonth mesReferencia,
+	public Pagamento(int id, Mensalidade mensalidade, YearMonth mesReferencia,
 			BigDecimal valorPago, LocalDateTime dataPagamento) {
 		this.id = id;
 		this.mensalidade = mensalidade;
@@ -30,8 +30,8 @@ public class ePagamento {
 	public int getId() { return id; }
 	public void setId(int id) { this.id = id; }
 
-	public eMensalidade getMensalidade() { return mensalidade; }
-	public void setMensalidade(eMensalidade mensalidade) { this.mensalidade = mensalidade; }
+	public Mensalidade getMensalidade() { return mensalidade; }
+	public void setMensalidade(Mensalidade mensalidade) { this.mensalidade = mensalidade; }
 
 	public YearMonth getMesReferencia() { return mesReferencia; }
 	public void setMesReferencia(YearMonth mesReferencia) { this.mesReferencia = mesReferencia; }
