@@ -1,0 +1,7 @@
+%% 4.4.1 Diagrama de Transição de Estados - Mensalidade
+stateDiagram-v2
+    [*] --> PENDENTE : virada do mês (prepararMes)
+    PENDENTE --> PAGA : registrar pagamento
+    PENDENTE --> VENCIDA : data de vencimento passou
+    VENCIDA --> PAGA : registrar pagamento
+    PAGA --> [*]

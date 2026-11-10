@@ -1,0 +1,14 @@
+%% 4.6.2 / 4.6.3 Diagrama de Componentes e Implantação
+flowchart LR
+    subgraph PC["«dispositivo» Computador da recepção"]
+        subgraph JVM["«ambiente» Java 21+ (JVM)"]
+            APPJ["«componente» Gymetrics<br/>(Swing)"]
+            JDBC["«componente» sqlite-jdbc 3.53"]
+        end
+        DB[("«artefato» gymetrics.db<br/>(SQLite)")]
+        CSV[/"«artefato» frequencias.csv"/]
+    end
+    TEC["Teclado e mouse (RNF10)"] --> APPJ
+    APPJ -- "java.sql / JDBC" --> JDBC
+    JDBC -- "leitura/escrita de arquivo" --> DB
+    APPJ -- "exportar (RF07)" --> CSV

@@ -1,0 +1,26 @@
+%% 4.2.1 Diagrama de Sequência - CSU04 Registrar Pagamento
+sequenceDiagram
+    autonumber
+    actor R as Recepcionista
+    participant T as TelaGerenciamentoFinanceiro
+    participant M as MensalidadeDAO
+    participant P as PagamentoDAO
+    participant BD as SQLite
+
+    R->>T: abre a tela Financeiro
+    T->>M: prepararMes(hoje)
+    M->>BD: gera mensalidades do mês e marca vencidas
+    T->>M: listarDoMes(mês atual)
+    M-->>T: lista de mensalidades (RF17)
+    R->>T: seleciona mensalidade, clica "Registrar Pagamento"
+    T-->>R: pede mês de referência e valor pago
+    R->>T: confirma
+    T->>P: salvar(pagamento)
+    activate P
+    P->>BD: BEGIN
+    P->>BD: INSERT INTO pagamentos
+    P->>BD: UPDATE mensalidades SET status='PAGA'
+    P->>BD: UPDATE alunos SET status='ATIVO' (se inadimplente)
+    P->>BD: COMMIT
+    deactivate P
+    T-->>R: "Pagamento registrado" e lista atualizada

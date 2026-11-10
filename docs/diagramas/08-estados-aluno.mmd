@@ -1,0 +1,12 @@
+%% 4.4.1 Diagrama de Transição de Estados - Aluno
+stateDiagram-v2
+    [*] --> ATIVO : cadastrar aluno (CSU01)
+    ATIVO --> INADIMPLENTE : mensalidade vence sem pagamento
+    INADIMPLENTE --> ATIVO : registrar pagamento (CSU04)
+    ATIVO --> BLOQUEADO : bloquear acesso com motivo (CSU07)
+    INADIMPLENTE --> BLOQUEADO : bloquear acesso com motivo (CSU07)
+    BLOQUEADO --> ATIVO : editar situação (CSU05)
+    note right of ATIVO
+        Só entra na catraca se ATIVO
+        e com cadastro completo
+    end note

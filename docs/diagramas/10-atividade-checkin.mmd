@@ -1,0 +1,23 @@
+%% 4.5.3 Diagrama de Atividades - catraca com botão único (TelaCheckin.confirmar)
+flowchart TD
+    A([Início]) --> B[/Recepcionista digita CPF ou código e confirma/]
+    B --> C{Aluno encontrado?}
+    C -- não --> N1[Exibe ALUNO NÃO ENCONTRADO]
+    C -- sim --> P{Já entrou hoje<br/>e não saiu?}
+    P -- sim --> S[Grava CHECK_OUT com data e hora]
+    S --> S2[Exibe SAÍDA REGISTRADA]
+    P -- não --> D{Status = BLOQUEADO?}
+    D -- sim --> N2[Grava TENTATIVA_NEGADA<br/>Acesso bloqueado]
+    D -- não --> E{Status = INADIMPLENTE?}
+    E -- sim --> N3[Grava TENTATIVA_NEGADA<br/>Mensalidade vencida]
+    E -- não --> F{Cadastro completo?}
+    F -- não --> N4[Grava TENTATIVA_NEGADA<br/>Cadastro incompleto]
+    F -- sim --> G[Grava CHECK_IN com data e hora]
+    G --> H[Exibe ACESSO LIBERADO em verde]
+    N2 --> X[Exibe motivo em vermelho]
+    N3 --> X
+    N4 --> X
+    N1 --> Z([Fim])
+    X --> Z
+    H --> Z
+    S2 --> Z

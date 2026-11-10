@@ -1,0 +1,63 @@
+%% 4.7.2 Modelo Relacional Normalizado (tabelas criadas em Data.criarTabelas)
+erDiagram
+    planos |o--o{ alunos : "plano_id"
+    alunos ||--o{ mensalidades : "aluno_id"
+    mensalidades ||--o{ pagamentos : "mensalidade_id"
+    alunos |o--o{ registros_acesso : "aluno_id"
+    alunos ||--o{ bloqueios_acesso : "aluno_id"
+    usuarios |o--o{ bloqueios_acesso : "usuario_id"
+
+    planos {
+        INTEGER id PK
+        TEXT nome "NOT NULL"
+        REAL valor_mensal "NOT NULL"
+        INTEGER dia_vencimento "NOT NULL"
+        INTEGER ativo "DEFAULT 1"
+    }
+    alunos {
+        INTEGER id PK
+        TEXT nome "NOT NULL"
+        TEXT cpf UK "NOT NULL"
+        TEXT endereco
+        TEXT telefone
+        TEXT data_nascimento
+        TEXT codigo_acesso UK
+        TEXT status "ATIVO, INADIMPLENTE, BLOQUEADO"
+        INTEGER plano_id FK
+    }
+    usuarios {
+        INTEGER id PK
+        TEXT login UK "NOT NULL"
+        TEXT senha "NOT NULL"
+        TEXT nome "NOT NULL"
+        TEXT perfil "ADMINISTRADOR, RECEPCIONISTA"
+        INTEGER ativo "DEFAULT 1"
+    }
+    mensalidades {
+        INTEGER id PK
+        INTEGER aluno_id FK
+        TEXT vencimento "NOT NULL"
+        REAL valor "NOT NULL"
+        TEXT status "PENDENTE, VENCIDA, PAGA"
+    }
+    pagamentos {
+        INTEGER id PK
+        INTEGER mensalidade_id FK
+        TEXT mes_referencia "NOT NULL"
+        REAL valor_pago "NOT NULL"
+        TEXT data_pagamento "NOT NULL"
+    }
+    registros_acesso {
+        INTEGER id PK
+        INTEGER aluno_id FK
+        TEXT data_hora "NOT NULL"
+        TEXT tipo "CHECK_IN, CHECK_OUT, TENTATIVA_NEGADA"
+        TEXT observacao
+    }
+    bloqueios_acesso {
+        INTEGER id PK
+        INTEGER aluno_id FK
+        TEXT motivo "NOT NULL"
+        TEXT data_hora "NOT NULL"
+        INTEGER usuario_id FK
+    }

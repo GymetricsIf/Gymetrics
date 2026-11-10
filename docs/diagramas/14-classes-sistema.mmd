@@ -1,0 +1,240 @@
+%% 4.3.1 / 4.3.2 Diagrama de Classes completo (entidades, controle/DAO, utilitárias e fronteira)
+%% Getters e setters das entidades foram omitidos para legibilidade.
+classDiagram
+    direction TB
+
+    namespace gymetrics {
+        class Main {
+            +main(String[] args)$
+        }
+        class GymSingleton {
+            <<singleton>>
+            -GymSingleton instance$
+            -CardLayout telasLayout
+            -Map~String,Component~ porNome
+            -Data data
+            -Usuario usuarioLogado
+            +getInstance()$ GymSingleton
+            +showTela(String nome)
+            +getUsuarioLogado() Usuario
+            +setUsuarioLogado(Usuario u)
+            +isAdmin() boolean
+            +sair()
+            +alunos() AlunoDAO
+            +planos() PlanoDAO
+            +usuarios() UsuarioDAO
+            +pagamentos() PagamentoDAO
+            +mensalidades() MensalidadeDAO
+            +acessos() RegistroAcessoDAO
+            +showMsg(String texto)
+            +showErro(Exception e)
+            +executar(Acao acao) boolean
+            +takeFrame() JPanel
+            -criarUsuariosIniciais()
+        }
+        class Data {
+            -Connection mConnection
+            +open(String arquivo)
+            +exec(String sql, SetupExecCallback setup, RowMapper~T~ mapper) List~T~
+            +insert(String sql, SetupExecCallback setup) int
+            +update(String sql, SetupExecCallback setup) int
+            +run(String sql)
+            +transacao(SqlAction acao)
+            +criarTabelas()
+            +suicide()
+        }
+        class SetupExecCallback {
+            <<interface>>
+            +setupExecParams(PreparedStatement ps)
+        }
+    }
+
+    namespace negocio {
+        class Aluno {
+            -int id
+            -String nome
+            -String cpf
+            -String endereco
+            -String telefone
+            -LocalDate dataNascimento
+            -String codigoAcesso
+            -Status status
+            -Plano plano
+            +cadastroCompleto() boolean
+            +podeAcessar() boolean
+            +validar()
+        }
+        class Plano {
+            -int id
+            -String nome
+            -BigDecimal valorMensal
+            -int diaVencimento
+            -boolean ativo
+            +validar()
+        }
+        class Mensalidade {
+            -int id
+            -Aluno aluno
+            -LocalDate vencimento
+            -BigDecimal valor
+            -Status status
+        }
+        class Pagamento {
+            -int id
+            -Mensalidade mensalidade
+            -YearMonth mesReferencia
+            -BigDecimal valorPago
+            -LocalDateTime dataPagamento
+            +validar()
+        }
+        class RegistroAcesso {
+            -int id
+            -Aluno aluno
+            -LocalDateTime dataHora
+            -Tipo tipo
+            -String observacao
+            +entrada(Aluno a)$ RegistroAcesso
+            +saida(Aluno a)$ RegistroAcesso
+        }
+        class Usuario {
+            -int id
+            -String login
+            -String senha
+            -String nome
+            -String perfil
+            -boolean ativo
+            +validar()
+        }
+    }
+
+    namespace dao {
+        class AlunoDAO {
+            -Data db
+            +salvar(Aluno a)
+            +atualizar(Aluno a)
+            +buscar(String termo) List~Aluno~
+            +buscarPorCpfOuCodigo(String valor) Aluno
+            +contar(Status status) int
+            +bloquear(Aluno a, String motivo, Usuario responsavel)
+        }
+        class PlanoDAO {
+            -Data db
+            +salvar(Plano p)
+            +atualizar(Plano p)
+            +listar() List~Plano~
+        }
+        class MensalidadeDAO {
+            -Data db
+            +prepararMes(LocalDate hoje)
+            +listarDoMes(YearMonth mes) List~Mensalidade~
+            +vencendo(LocalDate hoje, int dias) List~Mensalidade~
+        }
+        class PagamentoDAO {
+            -Data db
+            +salvar(Pagamento p)
+        }
+        class RegistroAcessoDAO {
+            -Data db
+            +salvar(RegistroAcesso r)
+            +registrarEntrada(Aluno a) RegistroAcesso
+            +registrarSaida(Aluno a) RegistroAcesso
+            +estaPresente(Aluno a, LocalDate dia) boolean
+            +contarEntradas(LocalDate dia) int
+            +contarPresentes(LocalDate dia) int
+            +listarPorPeriodo(LocalDate inicio, LocalDate fim) List~RegistroAcesso~
+        }
+        class UsuarioDAO {
+            -int MAX_TENTATIVAS$
+            -Data db
+            -Map~String,Integer~ tentativas
+            +salvar(Usuario u)
+            +contar() int
+            +estaBloqueado(String login) boolean
+            +autenticar(String login, String senha) Usuario
+        }
+    }
+
+    namespace util {
+        class ExportadorCSV {
+            <<utility>>
+            +exportarAcessos(List~RegistroAcesso~ lista, Path arquivo)$
+        }
+    }
+
+    namespace telas {
+        class Atualizavel {
+            <<interface>>
+            +atualizar()
+        }
+        class Estilo {
+            <<utility>>
+            +pagina()$ JPanel
+            +cabecalho(String titulo, String subtitulo)$ JPanel
+            +botao(String texto, Runnable acao)$ Botao
+            +tabela(String... colunas)$ JTable
+            +formulario(...)$ boolean
+        }
+        class TelaLogin {
+            -entrar()
+        }
+        class TelaPrincipal
+        class TelaCheckin {
+            -confirmar()
+        }
+        class TelaGerenciamentoAlunos {
+            -cadastrar()
+            -editar()
+            -bloquear()
+        }
+        class TelaGerenciamentoPlanos {
+            -cadastrar()
+            -editar()
+            -alternar()
+        }
+        class TelaGerenciamentoFinanceiro {
+            -registrarPagamento()
+        }
+        class TelaRelatorios {
+            -gerar()
+            -exportar()
+        }
+        class TelaDebug
+    }
+
+    %% associações entre entidades
+    Aluno "0..*" --> "0..1" Plano : assina
+    Mensalidade "0..*" --> "1" Aluno : cobra
+    Pagamento "0..*" --> "1" Mensalidade : quita
+    RegistroAcesso "0..*" --> "0..1" Aluno : registra
+
+    %% infraestrutura
+    Main ..> GymSingleton : getInstance()
+    GymSingleton *-- Data
+    GymSingleton *-- AlunoDAO
+    GymSingleton *-- PlanoDAO
+    GymSingleton *-- MensalidadeDAO
+    GymSingleton *-- PagamentoDAO
+    GymSingleton *-- RegistroAcessoDAO
+    GymSingleton *-- UsuarioDAO
+    GymSingleton --> Usuario : usuarioLogado
+    GymSingleton o-- Atualizavel : telas
+    Data ..> SetupExecCallback
+
+    %% DAOs persistem as entidades (o uso de Data aparece no atributo -Data db)
+    AlunoDAO ..> Aluno
+    PlanoDAO ..> Plano
+    MensalidadeDAO ..> Mensalidade
+    PagamentoDAO ..> Pagamento
+    RegistroAcessoDAO ..> RegistroAcesso
+    UsuarioDAO ..> Usuario
+    ExportadorCSV ..> RegistroAcesso
+
+    %% telas
+    Atualizavel <|.. TelaLogin
+    Atualizavel <|.. TelaPrincipal
+    Atualizavel <|.. TelaCheckin
+    Atualizavel <|.. TelaGerenciamentoAlunos
+    Atualizavel <|.. TelaGerenciamentoPlanos
+    Atualizavel <|.. TelaGerenciamentoFinanceiro
+    Atualizavel <|.. TelaRelatorios
+    TelaRelatorios ..> ExportadorCSV

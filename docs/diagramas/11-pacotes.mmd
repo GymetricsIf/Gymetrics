@@ -1,0 +1,27 @@
+%% 4.6.1 Diagrama de Pacotes
+flowchart TB
+    subgraph APP["br.com.gymetrics"]
+        MAIN["Main<br/>GymSingleton<br/>Data<br/>SetupExecCallback"]
+    end
+    subgraph TELAS["br.com.gymetrics.telas"]
+        T["TelaLogin · TelaPrincipal · TelaCheckin<br/>TelaGerenciamentoAlunos · TelaGerenciamentoPlanos<br/>TelaGerenciamentoFinanceiro · TelaRelatorios<br/>Estilo · Atualizavel"]
+    end
+    subgraph DAO["br.com.gymetrics.dao"]
+        D["AlunoDAO · PlanoDAO · UsuarioDAO<br/>MensalidadeDAO · PagamentoDAO · RegistroAcessoDAO"]
+    end
+    subgraph NEG["br.com.gymetrics.negocio"]
+        N["Aluno · Plano · Mensalidade<br/>Pagamento · RegistroAcesso · Usuario"]
+    end
+    subgraph UTIL["br.com.gymetrics.util"]
+        U["ExportadorCSV"]
+    end
+
+    MAIN --> TELAS
+    MAIN --> DAO
+    TELAS --> MAIN
+    TELAS --> DAO
+    TELAS --> NEG
+    TELAS --> UTIL
+    DAO --> MAIN
+    DAO --> NEG
+    UTIL --> NEG

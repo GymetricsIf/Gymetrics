@@ -1,0 +1,33 @@
+%% 4.2.1 Diagrama de Sequência - CSU08 Realizar Check-in (entrada e saída no mesmo botão)
+sequenceDiagram
+    autonumber
+    actor R as Recepcionista
+    participant T as TelaCheckin
+    participant A as AlunoDAO
+    participant RA as RegistroAcessoDAO
+    participant E as RegistroAcesso
+    participant BD as SQLite
+
+    R->>T: digita CPF/código, clica "Confirmar"
+    T->>A: buscarPorCpfOuCodigo(codigo)
+    A->>BD: SELECT aluno + plano
+    BD-->>A: aluno
+    A-->>T: Aluno (ou null)
+    T->>RA: estaPresente(aluno, hoje)
+    RA->>BD: última movimentação do aluno hoje
+    alt aluno já está dentro
+        T->>RA: registrarSaida(aluno)
+        RA->>BD: INSERT CHECK_OUT (RF06)
+        T-->>R: "SAÍDA REGISTRADA"
+    else aluno fora da academia
+        T->>RA: registrarEntrada(aluno)
+        RA->>E: entrada(aluno)
+        E->>E: aluno.podeAcessar()
+        E-->>RA: CHECK_IN ou TENTATIVA_NEGADA + motivo
+        RA->>BD: INSERT INTO registros_acesso (RF06 / RF18)
+        alt liberado
+            T-->>R: "ACESSO LIBERADO" em verde (RF05 / RNF08)
+        else negado
+            T-->>R: motivo em vermelho: bloqueado, mensalidade vencida ou cadastro incompleto (RF03 / RF04)
+        end
+    end

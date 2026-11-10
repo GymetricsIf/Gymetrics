@@ -1,0 +1,80 @@
+%% 3.3 / 4.3.1 Diagrama de Classes de Domínio (pacote br.com.gymetrics.negocio)
+classDiagram
+    direction LR
+    class Aluno {
+        -int id
+        -String nome
+        -String cpf
+        -String endereco
+        -String telefone
+        -LocalDate dataNascimento
+        -String codigoAcesso
+        -Status status
+        +cadastroCompleto() boolean
+        +podeAcessar() boolean
+        +validar() void
+    }
+    class Status_Aluno {
+        <<enumeration>>
+        ATIVO
+        INADIMPLENTE
+        BLOQUEADO
+    }
+    class Plano {
+        -int id
+        -String nome
+        -BigDecimal valorMensal
+        -int diaVencimento
+        -boolean ativo
+        +validar() void
+    }
+    class Mensalidade {
+        -int id
+        -LocalDate vencimento
+        -BigDecimal valor
+        -Status status
+    }
+    class Status_Mensalidade {
+        <<enumeration>>
+        PENDENTE
+        VENCIDA
+        PAGA
+    }
+    class Pagamento {
+        -int id
+        -YearMonth mesReferencia
+        -BigDecimal valorPago
+        -LocalDateTime dataPagamento
+        +validar() void
+    }
+    class RegistroAcesso {
+        -int id
+        -LocalDateTime dataHora
+        -Tipo tipo
+        -String observacao
+        +entrada(Aluno)$ RegistroAcesso
+        +saida(Aluno)$ RegistroAcesso
+    }
+    class Tipo_Acesso {
+        <<enumeration>>
+        CHECK_IN
+        CHECK_OUT
+        TENTATIVA_NEGADA
+    }
+    class Usuario {
+        -int id
+        -String login
+        -String senha
+        -String nome
+        -String perfil
+        -boolean ativo
+        +validar() void
+    }
+
+    Plano "0..1" <-- "0..*" Aluno : assina
+    Aluno "1" <-- "0..*" Mensalidade : cobra
+    Mensalidade "1" <-- "0..*" Pagamento : quita
+    Aluno "0..1" <-- "0..*" RegistroAcesso : registra
+    Aluno ..> Status_Aluno
+    Mensalidade ..> Status_Mensalidade
+    RegistroAcesso ..> Tipo_Acesso

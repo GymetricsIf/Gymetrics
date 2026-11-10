@@ -1,0 +1,41 @@
+%% 3.2.3 / 3.2.5 Casos de Uso primários organizados em pacotes
+flowchart LR
+    REC(["👤 Recepcionista"])
+    ADM(["👤 Administrador"])
+
+    subgraph SEG["Pacote Segurança"]
+        CSU03(["CSU03 Realizar Login"])
+    end
+    subgraph ALU["Pacote Alunos"]
+        CSU01(["CSU01 Cadastrar Aluno"])
+        CSU02(["CSU02 Buscar Aluno"])
+        CSU05(["CSU05 Editar Dados do Aluno"])
+        CSU07(["CSU07 Bloquear Acesso do Aluno"])
+    end
+    subgraph ACE["Pacote Acesso"]
+        CSU08(["CSU08 Realizar Check-in"])
+    end
+    subgraph FIN["Pacote Financeiro"]
+        CSU04(["CSU04 Registrar Pagamento"])
+        CSU06(["CSU06 Cadastrar Plano"])
+    end
+    subgraph REL["Pacote Relatórios"]
+        CSU09(["CSU09 Gerar Relatório de Frequência"])
+        CSU10(["CSU10 Exportar Frequências em CSV"])
+    end
+
+    REC --- CSU03
+    REC --- CSU01
+    REC --- CSU02
+    REC --- CSU05
+    REC --- CSU07
+    REC --- CSU08
+    REC --- CSU04
+    REC --- CSU10
+    ADM --- CSU03
+    ADM --- CSU06
+    ADM --- CSU09
+
+    CSU05 -. "«include»" .-> CSU02
+    CSU07 -. "«include»" .-> CSU02
+    CSU04 -. "«include»" .-> CSU02

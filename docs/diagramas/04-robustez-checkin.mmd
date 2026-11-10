@@ -1,0 +1,16 @@
+%% 3.3.1 Análise de Robustez - CSU08 Realizar Check-in
+%% «fronteira» tela, «controle» DAO, «entidade» classe de negócio
+flowchart LR
+    REC(["👤 Recepcionista"])
+    F["«fronteira»<br/>TelaCheckin"]
+    C1(("«controle»<br/>AlunoDAO"))
+    C2(("«controle»<br/>RegistroAcessoDAO"))
+    E1[("«entidade»<br/>Aluno")]
+    E2[("«entidade»<br/>RegistroAcesso")]
+
+    REC --- F
+    F -- "buscarPorCpfOuCodigo()" --> C1
+    C1 --> E1
+    F -- "registrarEntrada() / registrarSaida()" --> C2
+    C2 --> E2
+    E2 -. "podeAcessar()" .-> E1

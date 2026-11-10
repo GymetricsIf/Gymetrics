@@ -1,0 +1,23 @@
+%% 4.2.1 Diagrama de Sequência - CSU03 Realizar Login
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant T as TelaLogin
+    participant G as GymSingleton
+    participant D as UsuarioDAO
+    participant BD as SQLite
+
+    U->>T: digita usuário e senha, clica "Entrar"
+    T->>D: autenticar(login, senha)
+    D->>BD: SELECT * FROM usuarios WHERE login=? AND senha=? AND ativo=1
+    BD-->>D: linha do usuário / vazio
+    alt credenciais válidas
+        D-->>T: Usuario
+        T->>G: setUsuarioLogado(u)
+        T->>G: showTela("principal")
+        G-->>U: painel conforme o perfil (RF10 / RNF13)
+    else credenciais inválidas
+        D->>D: soma tentativa (bloqueia na 10ª - RNF12)
+        D-->>T: null
+        T-->>U: "Usuário ou senha incorretos."
+    end
